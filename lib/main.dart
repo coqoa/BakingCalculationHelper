@@ -6,8 +6,10 @@ import 'package:get/utils.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized(); // 추가
-  await Firebase.initializeApp(
-   options: const FirebaseOptions(
+  
+  try{
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
        apiKey: "AIzaSyBCUtKPIfnY2QGBHcB08D238ykGpV5SFGY",
        authDomain: "baking-weighing-assistant.firebaseapp.com",
        projectId: "baking-weighing-assistant",
@@ -16,8 +18,40 @@ void main() async{
        appId: "1:545566933824:web:4af0c89fb3dd4af7bcb0a5"
        
        ),
+    );
+  }catch(e){
+    print('e');
+    print(e);
+  }
+  // // ignore: unrelated_type_equality_checks
+  // if(Firebase.apps.length==false){
+  //   await Firebase.initializeApp(
+  //     options: const FirebaseOptions(
+  //      apiKey: "AIzaSyBCUtKPIfnY2QGBHcB08D238ykGpV5SFGY",
+  //      authDomain: "baking-weighing-assistant.firebaseapp.com",
+  //      projectId: "baking-weighing-assistant",
+  //      storageBucket: "baking-weighing-assistant.appspot.com",
+  //      messagingSenderId: "545566933824",
+  //      appId: "1:545566933824:web:4af0c89fb3dd4af7bcb0a5"
+       
+  //      ),
+  //   );
+  // }else{
+  //   Firebase.app();
+  // }
+  
+  // await Firebase.initializeApp(
+  //  options: const FirebaseOptions(
+  //      apiKey: "AIzaSyBCUtKPIfnY2QGBHcB08D238ykGpV5SFGY",
+  //      authDomain: "baking-weighing-assistant.firebaseapp.com",
+  //      projectId: "baking-weighing-assistant",
+  //      storageBucket: "baking-weighing-assistant.appspot.com",
+  //      messagingSenderId: "545566933824",
+  //      appId: "1:545566933824:web:4af0c89fb3dd4af7bcb0a5"
+       
+  //      ),
  
-  ); //  추가
+  // ); //  추가
 
   runApp(const MyApp());
 }
@@ -51,6 +85,13 @@ class _BakingCalculationAppState extends State<BakingCalculationApp> {
   
   @override
   void initState() {
+    Firebase.initializeApp().whenComplete(
+      (){print('COMPLETED');
+      setState(() {
+      
+      });}
+    );
+    
     super.initState();
   }
   @override
