@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "545566933824",
+    "project_id": "baking-weighing-assistant",
+    "storage_bucket": "baking-weighing-assistant.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545566933824:android:018dd7fb2060884abcb0a5",
+        "android_client_info": {
+          "package_name": "com.sideproject.baking_calculation_helper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "545566933824-cugd463c4ois5l6iaqm0t5nqgp9se558.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAllW0uSw9lmMDDgGDRlHFoO4JOfPC5mtc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "545566933824-cugd463c4ois5l6iaqm0t5nqgp9se558.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -22,6 +22,7 @@ if (flutterVersionName == null) {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
@@ -39,10 +40,12 @@ android {
         applicationId "com.sideproject.baking_calculation_helper"
         // You can update the following values to match your application needs. 
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 19       
+        // minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -56,4 +59,9 @@ android {
 
 flutter {
     source '../..'
+}
+dependencies {
+  implementation platform('com.google.firebase:firebase-bom:30.4.1')
+  implementation 'com.google.firebase:firebase-analytics'
+  implementation  'com.android.support:multidex:2.0.1'
 }
