@@ -1,8 +1,10 @@
-import 'package:baking_calculation_helper/apikey.dart';
+import 'package:baking_calculation_helper/controller/controller.dart';
+import 'package:baking_calculation_helper/screens/login.dart';
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:get/utils.dart';
+
+import 'package:baking_calculation_helper/apikey.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized(); // 추가
@@ -11,48 +13,17 @@ void main() async{
   try{
     await Firebase.initializeApp(
       options: FirebaseOptions(
-       apiKey: firebaseOptions.apiKey,
-       authDomain: firebaseOptions.authDomain,
-       projectId: firebaseOptions.projectId,
-       storageBucket: firebaseOptions.storageBucket,
-       messagingSenderId: firebaseOptions.messagingSenderId,
-       appId: firebaseOptions.appId
-       
-       ),
+        apiKey: firebaseOptions.apiKey,
+        authDomain: firebaseOptions.authDomain,
+        projectId: firebaseOptions.projectId,
+        storageBucket: firebaseOptions.storageBucket,
+        messagingSenderId: firebaseOptions.messagingSenderId,
+        appId: firebaseOptions.appId
+      ),
     );
   }catch(e){
-    print('e');
     print(e);
   }
-  // // ignore: unrelated_type_equality_checks
-  // if(Firebase.apps.length==false){
-  //   await Firebase.initializeApp(
-  //     options: const FirebaseOptions(
-  //      apiKey: "AIzaSyBCUtKPIfnY2QGBHcB08D238ykGpV5SFGY",
-  //      authDomain: "baking-weighing-assistant.firebaseapp.com",
-  //      projectId: "baking-weighing-assistant",
-  //      storageBucket: "baking-weighing-assistant.appspot.com",
-  //      messagingSenderId: "545566933824",
-  //      appId: "1:545566933824:web:4af0c89fb3dd4af7bcb0a5"
-       
-  //      ),
-  //   );
-  // }else{
-  //   Firebase.app();
-  // }
-  
-  // await Firebase.initializeApp(
-  //  options: const FirebaseOptions(
-  //      apiKey: "AIzaSyBCUtKPIfnY2QGBHcB08D238ykGpV5SFGY",
-  //      authDomain: "baking-weighing-assistant.firebaseapp.com",
-  //      projectId: "baking-weighing-assistant",
-  //      storageBucket: "baking-weighing-assistant.appspot.com",
-  //      messagingSenderId: "545566933824",
-  //      appId: "1:545566933824:web:4af0c89fb3dd4af7bcb0a5"
-       
-  //      ),
- 
-  // ); //  추가
 
   runApp(const MyApp());
 }
@@ -67,7 +38,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const BakingCalculationApp(),
+      // home: const BakingCalculationApp(),
+      home: Login(),
     );
   }
 }
@@ -79,19 +51,19 @@ class BakingCalculationApp extends StatefulWidget {
 }
 
 class _BakingCalculationAppState extends State<BakingCalculationApp> {
-
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  late final doc1= firestore.collection('test').doc('testd');
+  Controller firebaseController = Controller();
+  // FirebaseFirestore firestore = FirebaseFirestore.instance;
+  // late final doc1= firestore.collection('test').doc('testd');
   
   
   @override
   void initState() {
-    Firebase.initializeApp().whenComplete(
-      (){print('COMPLETED');
-      setState(() {
-      
-      });}
-    );
+    // Firebase.initializeApp().whenComplete(
+    //   (){
+    //     print('COMPLETED');
+    //     setState((){});
+    //   }
+    // );
     
     super.initState();
   }
@@ -110,17 +82,11 @@ class _BakingCalculationAppState extends State<BakingCalculationApp> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  ElevatedButton(onPressed: (){
-                    doc1.get().then(((value) => 
-                      print(value.data())
-                    ));
-                  }, child: const Text('버튼1')),
-                  const SizedBox(width: 10),
-                  ElevatedButton(onPressed: (){
-                    doc1.get().then(((value) => 
-                      print(value.data())
-                    ));
-                  }, child: const Text('버튼1')),
+                  ElevatedButton(
+                    onPressed: (){
+                      firebaseController.getList();
+                    }, 
+                    child: const Text('버튼1')),
                   const SizedBox(width: 10),
                 ],
               ),
