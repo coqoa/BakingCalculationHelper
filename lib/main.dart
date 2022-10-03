@@ -1,21 +1,22 @@
+import 'package:baking_calculation_helper/apikey.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/utils.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized(); // 추가
+  FIREBASE_API_KEYS firebaseOptions = FIREBASE_API_KEYS();
   
   try{
     await Firebase.initializeApp(
-      options: const FirebaseOptions(
-       apiKey: "AIzaSyBCUtKPIfnY2QGBHcB08D238ykGpV5SFGY",
-       authDomain: "baking-weighing-assistant.firebaseapp.com",
-       projectId: "baking-weighing-assistant",
-       storageBucket: "baking-weighing-assistant.appspot.com",
-       messagingSenderId: "545566933824",
-       appId: "1:545566933824:web:4af0c89fb3dd4af7bcb0a5"
+      options: FirebaseOptions(
+       apiKey: firebaseOptions.apiKey,
+       authDomain: firebaseOptions.authDomain,
+       projectId: firebaseOptions.projectId,
+       storageBucket: firebaseOptions.storageBucket,
+       messagingSenderId: firebaseOptions.messagingSenderId,
+       appId: firebaseOptions.appId
        
        ),
     );
