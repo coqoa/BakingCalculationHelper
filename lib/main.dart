@@ -7,7 +7,7 @@ import 'package:get/utils.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized(); // 추가
   FIREBASE_API_KEYS firebaseOptions = FIREBASE_API_KEYS();
-  
+
   try{
     await Firebase.initializeApp(
       options: FirebaseOptions(
@@ -110,6 +110,12 @@ class _BakingCalculationAppState extends State<BakingCalculationApp> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  ElevatedButton(onPressed: (){
+                    doc1.get().then(((value) => 
+                      print(value.data())
+                    ));
+                  }, child: const Text('버튼1')),
+                  const SizedBox(width: 10),
                   ElevatedButton(onPressed: (){
                     doc1.get().then(((value) => 
                       print(value.data())
