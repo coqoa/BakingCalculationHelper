@@ -1,4 +1,5 @@
 import 'package:baking_calculation_helper/config/palette.dart';
+import 'package:baking_calculation_helper/controller/controller.dart';
 import 'package:baking_calculation_helper/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,11 +14,15 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+
+  String loginValidator = '';
+
   bool isSignupScreen = false;
   String userEmail = '';
   String userPassword = '';
   String userPasswordCheck = '';
   final _formKey = GlobalKey<FormState>();
+  Controller controller = Controller();
 
   final _authentication = FirebaseAuth.instance;
 
@@ -130,48 +135,57 @@ class _LoginState extends State<Login> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        TextFormField(
-                          keyboardType: TextInputType.emailAddress,
-                          key: ValueKey(1),
-                          validator: (value){
-                            // 유효성검사
-                            if(value!.isEmpty || value.length < 4){
-                              return 'Please enter at least 4 characters';
-                            }
-                            return null;
+                        Focus( // 221005 이부분 해결하기
+                          onFocusChange: (value){
+                            controller.checkUser();
                           },
-                          onSaved: (value){
-                            userEmail = value!;
-                          },
-                          onChanged: (value){
-                            userEmail = value;
-                          },
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(
-                              Icons.account_circle,
-                              color: Palette.iconColor
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
+                          child: TextFormField(
+                            keyboardType: TextInputType.emailAddress,
+                            key: ValueKey(1),
+                            validator: (value){
+                              // 유효성검사
+                              if(value!.isEmpty || value.length < 4){
+                                return 'Please enter at least 4 characters';
+                              }
+                              return null;
+                            },
+                            onSaved: (value){
+                              userEmail = value!;
+                            },
+                            onChanged: (value){
+                              userEmail = value;
+                            },
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(
+                                Icons.account_circle,
+                                color: Palette.iconColor
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Palette.textColor1
+                                ),
+                                borderRadius: BorderRadius.circular(25)
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Palette.black
+                                ),
+                                borderRadius: BorderRadius.circular(25)
+                              ),
+                              hintText: 'E-Mail',
+                              hintStyle: TextStyle(
+                                fontSize: 14,
                                 color: Palette.textColor1
                               ),
-                              borderRadius: BorderRadius.circular(25)
+                              contentPadding: EdgeInsets.all(10.0)
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Palette.black
-                              ),
-                              borderRadius: BorderRadius.circular(25)
-                            ),
-                            hintText: 'E-Mail',
-                            hintStyle: TextStyle(
-                              fontSize: 14,
-                              color: Palette.textColor1
-                            ),
-                            contentPadding: EdgeInsets.all(10.0)
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(
+                          height: 20,
+                          child: Text(loginValidator),
+                        
+                        ),
                         TextFormField(
                           key: ValueKey(2),
                           validator: (value){
@@ -395,6 +409,7 @@ class _LoginState extends State<Login> {
                               password: userPassword
                             );
                             if(newUser.user != null){
+                              controller.addUser(userEmail);
                               Get.to(MainScreen());
                             }
                           }catch(e){

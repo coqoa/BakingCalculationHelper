@@ -6,16 +6,24 @@ class Controller extends GetxController{
   // final Repository _repo = Repository();
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  late final testdoc= firestore.collection('test').doc('testd');
+  late final userDoc= firestore.collection('Home').doc('User');
   
+  void checkUser(){}
+
+  void addUser(String userEmail)async{
+    await userDoc.collection(userEmail).doc(userEmail).set({"userEmail":userEmail});
+  }
+
+
+  //  ---
   Future<void> getList() async {
 
-    testdoc.get().then(((value) => 
+    userDoc.get().then(((value) => 
       print(value.data())
     ));
   }
   void setDB(){
-    testdoc.set({
+    userDoc.set({
       'filed4' : '4',
       'field5' : '5',
       'field6' : '6',
@@ -23,13 +31,13 @@ class Controller extends GetxController{
     });
   }
   void readDB(){
-    testdoc.get().then((value){
+    userDoc.get().then((value){
       print(value.data());
     });
   }
 
   void updateDB(String key, String value){
-    testdoc.update({
+    userDoc.update({
       key:value
     });
   }
