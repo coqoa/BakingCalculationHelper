@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'package:baking_calculation_helper/apikey.dart';
+import 'package:get/route_manager.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized(); // 추가
@@ -33,11 +34,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      debugShowCheckedModeBanner: false,
       // home: const BakingCalculationApp(),
       home: Login(),
     );
