@@ -1,6 +1,7 @@
 import 'package:baking_calculation_helper/config/palette.dart';
 import 'package:baking_calculation_helper/controller/controller.dart';
 import 'package:baking_calculation_helper/screens/main_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,9 +23,12 @@ class _LoginState extends State<Login> {
   String userPassword = '';
   String userPasswordCheck = '';
   final _formKey = GlobalKey<FormState>();
-  Controller controller = Controller();
 
+  Controller controller = Controller();
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
   final _authentication = FirebaseAuth.instance;
+
+  bool signupIdCheck = true;
 
   void _tryValudation(){
     final isValid = _formKey.currentState!.validate();
@@ -32,6 +36,13 @@ class _LoginState extends State<Login> {
       _formKey.currentState!.save();
     }
   }
+
+  @override
+  void initState() {
+    super.initState();
+    // controller.checkUser('admin1@gmail.com');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,50 +146,48 @@ class _LoginState extends State<Login> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        Focus( // 221005 이부분 해결하기
-                          onFocusChange: (value){
-                            controller.checkUser();
+                        TextFormField(
+                          keyboardType: TextInputType.emailAddress,
+                          key: ValueKey(1),
+                          validator: (value){
+                            // 유효성검사
+                            if(value!.isEmpty || value.length < 4){
+                              return 'Please enter at least 4 characters';
+                            }
+                            return null;
                           },
-                          child: TextFormField(
-                            keyboardType: TextInputType.emailAddress,
-                            key: ValueKey(1),
-                            validator: (value){
-                              // 유효성검사
-                              if(value!.isEmpty || value.length < 4){
-                                return 'Please enter at least 4 characters';
-                              }
-                              return null;
-                            },
-                            onSaved: (value){
-                              userEmail = value!;
-                            },
-                            onChanged: (value){
-                              userEmail = value;
-                            },
-                            decoration: InputDecoration(
-                              prefixIcon: Icon(
-                                Icons.account_circle,
-                                color: Palette.iconColor
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Palette.textColor1
-                                ),
-                                borderRadius: BorderRadius.circular(25)
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Palette.black
-                                ),
-                                borderRadius: BorderRadius.circular(25)
-                              ),
-                              hintText: 'E-Mail',
-                              hintStyle: TextStyle(
-                                fontSize: 14,
+                          onSaved: (value){
+                            userEmail = value!;
+                          },
+                          onChanged: (value){
+                            userEmail = value;
+                          },
+                          onFieldSubmitted: (value) => {
+                            controller.getUser(userEmail, "recipee")
+                          },
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(
+                              Icons.account_circle,
+                              color: Palette.iconColor
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
                                 color: Palette.textColor1
                               ),
-                              contentPadding: EdgeInsets.all(10.0)
+                              borderRadius: BorderRadius.circular(25)
                             ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Palette.black
+                              ),
+                              borderRadius: BorderRadius.circular(25)
+                            ),
+                            hintText: 'E-Mail',
+                            hintStyle: TextStyle(
+                              fontSize: 14,
+                              color: Palette.textColor1
+                            ),
+                            contentPadding: EdgeInsets.all(10.0)
                           ),
                         ),
                         SizedBox(
@@ -253,23 +262,41 @@ class _LoginState extends State<Login> {
                           onSaved: (value){
                             userEmail = value!;
                           },
+
                           onChanged: (value){
                             userEmail = value;
+                            // 유저아이디 유효성 체크
+                            if(userEmail.length>0){
+                              firestore.collection(userEmail).doc(userEmail).get().then((value){
+                                if(value.data() == null){
+                                  setState(() {
+                                    signupIdCheck = true;
+                                  });
+                                }else{
+                                  setState(() {
+                                    signupIdCheck = false;
+                                  });
+                                }
+                              });
+                            }
                           },
+                          style: TextStyle(
+                            color: signupIdCheck ? Palette.black : Palette.red 
+                          ),
                           decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.account_circle,
-                              color: Palette.iconColor
+                              color: signupIdCheck ? Palette.iconColor : Palette.red 
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: Palette.textColor1
+                                color: signupIdCheck ? Palette.textColor1 : Palette.red 
                               ),
                               borderRadius: BorderRadius.circular(25)
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: Palette.black
+                                color: signupIdCheck ? Palette.textColor1 : Palette.red 
                               ),
                               borderRadius: BorderRadius.circular(25)
                             ),
@@ -281,7 +308,17 @@ class _LoginState extends State<Login> {
                             contentPadding: EdgeInsets.all(10.0)
                           ),
                         ),
-                         SizedBox(height: 20),
+                        Container(
+                          height: 20,
+                          child: Text(signupIdCheck ? '' : '존재하는 아이디 입니다',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: "NotoSansRegular",
+                              color: Colors.red[400],
+                              // fontWeight: FontWeight.bold,
+                            ),
+                          ),  
+                        ),
                          // 비밀번호
                         TextFormField(
                           key: ValueKey(4),
@@ -374,7 +411,7 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 SizedBox(height: 10),
-                // 로그인 / 회원가입 버튼
+                // 버튼
                 Center(
                   child: Container(
                     height: 70,
@@ -409,7 +446,9 @@ class _LoginState extends State<Login> {
                               password: userPassword
                             );
                             if(newUser.user != null){
-                              controller.addUser(userEmail);
+
+                              // 엔터키 이벤트에도 아래 두 라인 추가하기 // 221006
+                              controller.setUserInit(userEmail);
                               Get.to(MainScreen());
                             }
                           }catch(e){
