@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:baking_calculation_helper/config/palette.dart';
 import 'package:baking_calculation_helper/controller/controller.dart';
 import 'package:baking_calculation_helper/screens/main_screen.dart';
@@ -28,7 +30,69 @@ class _LoginState extends State<Login> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final _authentication = FirebaseAuth.instance;
 
-  bool signupIdCheck = true;
+  // 신규 가입 계정에도 [firebase_auth/email-already-in-use] The email address is already in use by another account. 에러뜨고 안넘어감
+  // 말도안되는 계정메일 걸러야함
+  // 텍스트필드 클래스화하기
+  // 코드 정리하기
+
+  // 어디에 사용하는 변수?
+  bool signupIdDefault = true;
+  // 어디에 사용하는 변수?
+  String signupIdValidateValue = '';
+  // Signup Id Validate Function
+  void signupIdValidateFunc(userEmail, signupIdDefault){
+    if(!userEmail.contains('@')){
+      setState(() {
+        signupIdValidateValue = '이메일 형식으로 작성해주세요';
+      });
+    }
+    if(!userEmail.contains('.')){
+      setState(() {
+        signupIdValidateValue = '이메일 형식으로 작성해주세요';
+      });
+    }
+    if(userEmail.contains('@') && userEmail.contains('.')){
+      setState(() {
+        signupIdValidateValue = '';
+      });
+    }
+    if(signupIdDefault == false){
+      setState(() {
+        signupIdValidateValue = '존재하는 아이디 입니다';
+      });
+    }
+  }
+
+  // Firebase Auth Error Handling Function
+  void authErrorHandlingfunc(String errorCode){
+    switch (errorCode) {
+      case '[firebase_auth/invalid-email] The email address is badly formatted.':
+          setState(() {
+            validatorValue = '이메일형식지켜';
+          });
+          log('validatorValue');
+          print(validatorValue);
+        break;
+      case '[firebase_auth/missing-email] Error':
+          setState(() {
+            validatorValue = '에러다임마';
+          });
+          log('validatorValue');
+          print(validatorValue);
+        break;
+
+      default:
+        log('---------------------------errorCode--------------------------');
+        print(errorCode);
+        log('---------------------------errorCode--------------------------');
+    }
+  }
+
+
+  bool signupPasswordValidator = true;
+  bool signupPasswordCheckValidator = true;
+
+  String validatorValue = '';
 
   void _tryValudation(){
     final isValid = _formKey.currentState!.validate();
@@ -54,7 +118,7 @@ class _LoginState extends State<Login> {
           width: MediaQuery.of(context).size.width< 1950 
           ? MediaQuery.of(context).size.width*0.6 
           : MediaQuery.of(context).size.width*0.5,
-          height: !isSignupScreen ? 280 : 350,
+          height: !isSignupScreen ? 300 : 400,
           // color: Colors.green,
           padding: EdgeInsets.fromLTRB(40, 20, 40, 20),
           decoration: BoxDecoration(
@@ -178,7 +242,7 @@ class _LoginState extends State<Login> {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: Palette.black
+                                color: Palette.blue
                               ),
                               borderRadius: BorderRadius.circular(25)
                             ),
@@ -224,7 +288,7 @@ class _LoginState extends State<Login> {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: Palette.black
+                                color: Palette.blue
                               ),
                               borderRadius: BorderRadius.circular(25)
                             ),
@@ -241,7 +305,7 @@ class _LoginState extends State<Login> {
                   ),
                 )
                 
-                // 사인업 탭
+                // 사인업
                 : Container(
                   margin: EdgeInsets.only(top: 20),
                   child: Form(
@@ -250,6 +314,7 @@ class _LoginState extends State<Login> {
                       children: [
                         // 아이디
                         TextFormField(
+                          autofocus: true,
                           keyboardType: TextInputType.emailAddress,
                           key: ValueKey(3),
                           validator: (value){
@@ -268,35 +333,51 @@ class _LoginState extends State<Login> {
                             // 유저아이디 유효성 체크
                             if(userEmail.length>0){
                               firestore.collection(userEmail).doc(userEmail).get().then((value){
-                                if(value.data() == null){
+                                if(value.data() == null){ // null이면 데이터가 없으니깐 사용가능
                                   setState(() {
-                                    signupIdCheck = true;
+                                    signupIdDefault = true;
+                                    signupIdValidateFunc(userEmail, signupIdDefault);
                                   });
                                 }else{
                                   setState(() {
-                                    signupIdCheck = false;
+                                    signupIdDefault = false;
+                                    signupIdValidateFunc(userEmail, signupIdDefault);
                                   });
                                 }
                               });
                             }
+                            
                           },
                           style: TextStyle(
-                            color: signupIdCheck ? Palette.black : Palette.red 
+                            color: signupIdDefault ? Palette.black : Palette.red 
+                            // color: (){
+                            //     // signupIdDefault ? Palette.iconColor : Palette.red 
+                            //     // 그린 표시
+                            //     if(signupIdDefault){
+                            //       if(signupIdValidator){
+                            //         Palette.green;
+                            //       }else{
+                            //         Palette.iconColor;
+                            //       }
+                            //     }else if(!signupIdDefault){
+                            //       Palette.red;
+                            //     }
+                            //   }()
                           ),
                           decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.account_circle,
-                              color: signupIdCheck ? Palette.iconColor : Palette.red 
+                              color: signupIdDefault ? Palette.iconColor : Palette.red 
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: signupIdCheck ? Palette.textColor1 : Palette.red 
+                                color: signupIdDefault ? Palette.textColor1 : Palette.red 
                               ),
                               borderRadius: BorderRadius.circular(25)
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: signupIdCheck ? Palette.textColor1 : Palette.red 
+                                color: signupIdDefault ? Palette.blue : Palette.red 
                               ),
                               borderRadius: BorderRadius.circular(25)
                             ),
@@ -308,17 +389,22 @@ class _LoginState extends State<Login> {
                             contentPadding: EdgeInsets.all(10.0)
                           ),
                         ),
+
                         Container(
                           height: 20,
-                          child: Text(signupIdCheck ? '' : '존재하는 아이디 입니다',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontFamily: "NotoSansRegular",
-                              color: Colors.red[400],
-                              // fontWeight: FontWeight.bold,
-                            ),
-                          ),  
+
+                          // child: Text(signupIdDefault ? '' : '존재하는 아이디 입니다',
+                          //   style: TextStyle(
+                          //     fontSize: 12,
+                          //     fontFamily: "NotoSansRegular",
+                          //     color: Colors.red[400],
+                          //     // fontWeight: FontWeight.bold,
+                          //   ),
+                          // ),  
+
+                          child: Text(signupIdValidateValue),
                         ),
+
                          // 비밀번호
                         TextFormField(
                           key: ValueKey(4),
@@ -334,22 +420,34 @@ class _LoginState extends State<Login> {
                           },
                           onChanged: (value){
                             userPassword = value;
+                            if(userPassword.length < 6){
+                              setState(() {
+                                signupPasswordValidator = false;
+                              });
+                            }else{
+                              setState(() {
+                                signupPasswordValidator = true;
+                              });
+                            }
                           },
+                          style: TextStyle(
+                            color: signupPasswordValidator ? Palette.black : Palette.red 
+                          ),
                           obscureText: true,
                           decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.lock,
-                              color: Palette.iconColor
+                              color: signupPasswordValidator ? Palette.iconColor : Palette.red
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: Palette.textColor1
+                                color: signupPasswordValidator ? Palette.textColor1 : Palette.red
                               ),
                               borderRadius: BorderRadius.circular(25)
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: Palette.black
+                                color: signupPasswordValidator ? Palette.blue : Palette.red
                               ),
                               borderRadius: BorderRadius.circular(25)
                             ),
@@ -361,7 +459,19 @@ class _LoginState extends State<Login> {
                             contentPadding: EdgeInsets.all(10.0)
                           ),
                         ),
-                         SizedBox(height: 20),
+
+                        Container(
+                          height: 20,
+                          child: Text(signupPasswordValidator ? '' : '6자 이상 입력하세요',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: "NotoSansRegular",
+                              color: Colors.red[400],
+                              // fontWeight: FontWeight.bold,
+                            ),
+                          ),  
+                        ),
+
                          // 비밀번호 확인
                         TextFormField(
                           key: ValueKey(5),
@@ -379,43 +489,66 @@ class _LoginState extends State<Login> {
                           },
                           onChanged: (value){
                             userPasswordCheck = value;
+                            if(userPassword != userPasswordCheck){
+                              setState(() {
+                                signupPasswordCheckValidator = false;
+                              });
+                            }else{
+                              setState(() {
+                                signupPasswordCheckValidator = true;
+                              });
+                            }
                           },
+                          style: TextStyle(
+                            color: signupPasswordCheckValidator ? Palette.black : Palette.red 
+                          ),
                           obscureText: true,
                           decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.lock_outlined,
-                              color: Palette.iconColor
+                              color: signupPasswordCheckValidator ? Palette.iconColor : Palette.red
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: Palette.textColor1
+                                color: signupPasswordCheckValidator ? Palette.textColor1 : Palette.red
                               ),
                               borderRadius: BorderRadius.circular(25)
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                color: Palette.black
+                                color: signupPasswordCheckValidator ? Palette.blue : Palette.red
                               ),
                               borderRadius: BorderRadius.circular(25)
                             ),
                             hintText: 'Password Check',
                             hintStyle: TextStyle(
                               fontSize: 14,
-                              color: Palette.textColor1
+                              color:Palette.textColor1
                             ),
                             contentPadding: EdgeInsets.all(10.0)
                           ),
+                        ),
+
+                        Container(
+                          height: 20,
+                          child: Text(signupPasswordCheckValidator ? '' : '비밀번호가 일치하지 않습니다',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: "NotoSansRegular",
+                              color: Colors.red[400],
+                              // fontWeight: FontWeight.bold,
+                            ),
+                          ),  
                         ),
                       ],
                     )
                   ),
                 ),
                 SizedBox(height: 10),
+
                 // 버튼
                 Center(
                   child: Container(
-                    height: 70,
-                    width: 120,
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: Palette.white,
@@ -445,44 +578,56 @@ class _LoginState extends State<Login> {
                               email: userEmail, 
                               password: userPassword
                             );
-                            if(newUser.user != null){
-
-                              // 엔터키 이벤트에도 아래 두 라인 추가하기 // 221006
-                              controller.setUserInit(userEmail);
-                              Get.to(MainScreen());
+                            if(userEmail.length>0 && userPassword.length > 6 && userPassword==userPasswordCheck){
+                              if(newUser.user != null){
+                                // 엔터키 이벤트에도 아래 두 라인 추가하기 // 221006
+                                controller.setUserInit(userEmail);
+                                Get.to(MainScreen());
+                              }
                             }
+                            
                           }catch(e){
-                            print(e);
+                            setState(() {
+                              authErrorHandlingfunc(e.toString());
+                            });
 
                           }
                         }
-                        
-                        
                       },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.orange,
-                              Colors.red
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 50,
+                            width: 120,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.orange,
+                                  Colors.red
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  spreadRadius: 1,
+                                  blurRadius: 1,
+                                  offset: Offset(0,1)
+                                )
+                              ]
+                            ),
+                            child: Icon(
+                              Icons.arrow_forward,
+                              color: Palette.white
+                            ),
                           ),
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              spreadRadius: 1,
-                              blurRadius: 1,
-                              offset: Offset(0,1)
-                            )
-                          ]
-                        ),
-                        child: Icon(
-                          Icons.arrow_forward,
-                          color: Palette.white
-                        ),
+                          SizedBox(height: 10,),
+                          Container(
+                            child: Text(validatorValue),
+                          )
+                        ],
                       ),
                     ),
                   ),
