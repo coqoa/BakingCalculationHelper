@@ -574,11 +574,12 @@ class _LoginState extends State<Login> {
                           // 사인업 탭이면
                           _tryValudation();
                           try{
-                            final newUser = await _authentication.createUserWithEmailAndPassword(
-                              email: userEmail, 
-                              password: userPassword
-                            );
                             if(userEmail.length>0 && userPassword.length > 6 && userPassword==userPasswordCheck){
+                              final newUser = await _authentication.createUserWithEmailAndPassword(
+                                email: userEmail, 
+                                password: userPassword
+                              );
+                            // if(userEmail.length>0 && userPassword.length > 6 && userPassword==userPasswordCheck){
                               if(newUser.user != null){
                                 // 엔터키 이벤트에도 아래 두 라인 추가하기 // 221006
                                 controller.setUserInit(userEmail);
