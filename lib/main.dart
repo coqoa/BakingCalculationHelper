@@ -40,8 +40,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      // home: const BakingCalculationApp(),
-      home: Login(),
+      home: const BakingCalculationApp(),
+      // home: Login(),
     );
   }
 }

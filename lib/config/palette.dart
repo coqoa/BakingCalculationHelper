@@ -9,6 +9,11 @@ class Palette{
   static const Color blue = Colors.blue;
   static const Color gray = Color(0xFFB6C7d1);
 
+  static const Color lightGreen = Color.fromRGBO(109, 151, 115, 1);
+  static const Color darkGreen = Color.fromRGBO(12, 59, 46, 1);
+  static const Color darkBeige = Color.fromRGBO(187, 138, 82, 1);
+  static const Color darkYellow = Color.fromRGBO(255, 186, 0, 1);
+
   static const Color iconColor = Color(0xFFB6C7D1);
   static const Color activeColor = Color(0xFF09126C);
   static const Color textColor1 = Color(0XFFA7BCC7);
