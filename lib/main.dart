@@ -73,7 +73,7 @@ class _BakingCalculationAppState extends State<BakingCalculationApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:const Text('베이킹 계산 도우미'),
+        title:const Text('베이킹 계산 도우미'),  
       ),
       body: Center(
         child: Column(
